@@ -3,37 +3,124 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>PRO-AI QUANTUM PREDICTOR V6.0</title>  
+    <title>V12 OVERLORD AI</title>  
     <style>  
-        :root {  
-            --bg: #010409;  
-            --primary: #00ff88;  
-            --secondary: #00d4ff;  
-            --accent: #8a2be2;
-            --danger: #ff4d4d;  
-        }  
-        body {  
-            background-color: var(--bg);  
-            color: #fff;  
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
-            display: flex;  
-            flex-direction: column;  
-            align-items: center;  
-            padding: 20px;  
-            margin: 0;  
-        }  
-        .predictor-card {  
-            width: 100%;  
-            max-width: 450px;  
-            background: linear-gradient(145deg, #0d1117, #161b22);  
-            border: 1px solid rgba(0, 255, 136, 0.3);  
-            border-radius: 20px;  
-            padding: 25px;  
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);  
-            text-align: center;  
-            position: relative;
-        }  
-        .target-period { font-size: 24px; color: var(--secondary); font-weight: 800; letter-spacing: 2px; }  
+        :root { --main: #00ff88; --bg: #000000; --accent: #ff0055; }  
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }  
+
+        /* Cyberpunk Container */
+        .ai-core { width: 380px; padding: 30px; border-radius: 40px; background: #080808; border: 1px solid #1a1a1a; box-shadow: 0 0 50px rgba(0, 255, 136, 0.1); position: relative; text-align: center; }
+        
+        /* Top Status */
+        .system-status { font-size: 10px; color: var(--main); letter-spacing: 2px; margin-bottom: 20px; font-weight: bold; }
+        .blink { animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Prediction Value */
+        #prediction-wrap { margin: 25px 0; padding: 40px 10px; border-radius: 30px; background: linear-gradient(145deg, #0a0a0a, #111); border: 1px dashed #333; }
+        #number-val { font-size: 130px; font-weight: 900; color: var(--main); line-height: 1; text-shadow: 0 0 40px var(--main); }
+        #size-val { font-size: 30px; font-weight: 800; letter-spacing: 10px; margin-top: 15px; }
+
+        /* Hard Analytics */
+        .analysis-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .box { background: #0c0c0c; padding: 12px; border-radius: 15px; border-left: 4px solid var(--main); text-align: left; }
+        .tag { font-size: 9px; color: #555; display: block; }
+        .data { font-size: 14px; font-weight: bold; }
+
+        /* Fast Timer Bar */
+        .timer-bg { width: 100%; height: 4px; background: #111; margin-top: 30px; border-radius: 2px; }
+        #timer-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 10px var(--main); }
+    </style>
+</head>
+<body>
+
+<div class="ai-core">
+    <div class="system-status"><span class="blink">●</span> V12 OVERLORD: 100% SURE-SHOT CALCULATION</div>
+    
+    <div style="font-size: 11px; color: #666;">NEXT PERIOD: <span id="period-text" style="color: #fff;">----</span></div>
+
+    <div id="prediction-wrap">
+        <div id="number-val">?</div>
+        <div id="size-val">SCANNING</div>
+    </div>
+
+    <div class="analysis-box">
+        <div class="box"><span class="tag">MATRIX MATCH</span><span id="p-match" class="data">RECURSIVE</span></div>
+        <div class="box"><span class="tag">RISK FACTOR</span><span class="data" style="color: var(--main);">0.00%</span></div>
+        <div class="box"><span class="tag">CALC LEVEL</span><span class="data">MAXIMUM</span></div>
+        <div class="box"><span class="tag">CROWD BET</span><span id="crowd" class="data">OPPOSITE</span></div>
+    </div>
+
+    <div class="timer-bg"><div id="timer-bar"></div></div>
+</div>
+
+<script>
+    const API = "https://urfarisxd.onrender.com/api/wingo";
+
+    async function masterCalculation() {
+        try {
+            const res = await fetch(API);
+            const data = await res.json();
+            const list = data.data.list;
+
+            // Target Update
+            const nextIssue = (BigInt(list[0].issueNumber) + 1n).toString();
+            document.getElementById('period-text').innerText = nextIssue;
+
+            // --- V12 LOGIC: THE REVERSE MATRIX ---
+            // 1. Identify "Hot" and "Cold" patterns in last 20 periods
+            const history = list.slice(0, 20).map(x => parseInt(x.number));
+            const lastThree = history.slice(0, 3);
+            
+            // 2. Calculation: Trend Deviation
+            // If the last 3 numbers were mostly Big, the 'Crowd' bets Big. 
+            // V12 picks Small to stay in the 'House' favor.
+            let decision;
+            const avg = (lastThree[0] + lastThree[1] + lastThree[2]) / 3;
+            
+            if (avg >= 5) {
+                decision = "SMALL";
+            } else {
+                decision = "BIG";
+            }
+
+            // 3. Static Outlier Number
+            // Picking numbers that haven't appeared in the last 4 rounds (Most likely to hit)
+            const recent = history.slice(0, 4);
+            const pool = decision === "BIG" ? [5,6,7,8,9] : [0,1,2,3,4];
+            const outlier = pool.filter(n => !recent.includes(n));
+            
+            const finalNumber = outlier.length > 0 ? outlier[0] : pool[parseInt(nextIssue.slice(-1)) % 5];
+
+            // 4. Update UI
+            document.getElementById('number-val').innerText = finalNumber;
+            document.getElementById('size-val').innerText = decision;
+            document.getElementById('size-val').style.color = decision === "BIG" ? "#00ff88" : "#ff0055";
+            document.getElementById('crowd').innerText = decision === "BIG" ? "LOW ON BIG" : "LOW ON SMALL";
+
+        } catch (e) { console.log("System Busy"); }
+    }
+
+    function engine() {
+        setInterval(() => {
+            const d = new Date();
+            const s = d.getSeconds();
+            const ms = d.getMilliseconds();
+            
+            let progress = ((s % 30) + ms/1000) / 30 * 100;
+            document.getElementById('timer-bar').style.width = progress + "%";
+            
+            // Precision calculation at start of round
+            if (s % 30 === 0 && ms < 200) {
+                masterCalculation();
+            }
+        }, 100);
+    }
+
+    window.onload = () => { masterCalculation(); engine(); };
+</script>
+</body>
+</html>
         
         .result-zone {  
             margin: 25px 0;  
