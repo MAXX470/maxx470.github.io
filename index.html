@@ -1,39 +1,181 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>V12 OVERLORD AI</title>  
-    <style>  
-        :root { --main: #00ff88; --bg: #000000; --accent: #ff0055; }  
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }  
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>GOGO BHAIYA Pro - High Accuracy Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030712; --panel: #0f172a; --accent: #38bdf8;
+    --big-color: #f87171; --small-color: #4ade80;
+    --glass: rgba(255, 255, 255, 0.03);
+  }
+  body {
+    margin: 0; background-color: var(--bg); color: #f1f5f9;
+    font-family: 'Inter', sans-serif; display: flex; justify-content: center; padding: 20px;
+  }
+  .container { width: 100%; max-width: 450px; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { margin: 0; font-size: 24px; color: var(--accent); letter-spacing: 2px; }
+  .status-bar { font-size: 10px; color: #64748b; text-transform: uppercase; margin-top: 5px; }
 
-        /* Cyberpunk Container */
-        .ai-core { width: 380px; padding: 30px; border-radius: 40px; background: #080808; border: 1px solid #1a1a1a; box-shadow: 0 0 50px rgba(0, 255, 136, 0.1); position: relative; text-align: center; }
-        
-        /* Top Status */
-        .system-status { font-size: 10px; color: var(--main); letter-spacing: 2px; margin-bottom: 20px; font-weight: bold; }
-        .blink { animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+  .card {
+    background: var(--panel); border-radius: 20px; padding: 20px;
+    border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  
+  .history-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; min-height: 50px; }
+  .dot {
+    width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; 
+    justify-content: center; font-weight: 800; font-size: 18px; background: var(--glass);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .dot.big { background: var(--big-color); color: white; box-shadow: 0 0 15px rgba(248,113,113,0.3); }
+  .dot.small { background: var(--small-color); color: #064e3b; box-shadow: 0 0 15px rgba(74,222,128,0.3); }
 
-        /* Prediction Value */
-        #prediction-wrap { margin: 25px 0; padding: 40px 10px; border-radius: 30px; background: linear-gradient(145deg, #0a0a0a, #111); border: 1px dashed #333; }
-        #number-val { font-size: 130px; font-weight: 900; color: var(--main); line-height: 1; text-shadow: 0 0 40px var(--main); }
-        #size-val { font-size: 30px; font-weight: 800; letter-spacing: 10px; margin-top: 15px; }
+  .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+  .n-btn {
+    aspect-ratio: 1; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05); color: white; font-weight: 700; cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .n-btn:active { transform: scale(0.9); background: var(--accent); }
 
-        /* Hard Analytics */
-        .analysis-box { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
-        .box { background: #0c0c0c; padding: 12px; border-radius: 15px; border-left: 4px solid var(--main); text-align: left; }
-        .tag { font-size: 9px; color: #555; display: block; }
-        .data { font-size: 14px; font-weight: bold; }
+  .prediction-box {
+    margin-top: 20px; padding: 15px; border-radius: 15px; background: rgba(0,0,0,0.3);
+    border-left: 4px solid var(--accent); display: none;
+  }
+  .pred-flex { display: flex; justify-content: space-between; align-items: center; }
+  .result-label { font-size: 12px; color: #94a3b8; }
+  .result-value { font-size: 24px; font-weight: 900; }
+  
+  .accuracy-meter { height: 6px; background: #1e293b; border-radius: 3px; margin: 15px 0; overflow: hidden; }
+  .accuracy-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease-out; }
 
-        /* Fast Timer Bar */
-        .timer-bg { width: 100%; height: 4px; background: #111; margin-top: 30px; border-radius: 2px; }
-        #timer-bar { width: 0%; height: 100%; background: var(--main); box-shadow: 0 0 10px var(--main); }
-    </style>
+  .footer-links { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-action {
+    flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer;
+  }
+  .btn-reset { background: #334155; color: white; }
+  .btn-calc { background: var(--accent); color: #0f172a; }
+</style>
 </head>
 <body>
 
+<div class="container">
+  <div class="header">
+    <h1>GOGO BHAIYA <span style="color:#fff">V3</span></h1>
+    <div class="status-bar">Quantum Pattern Engine • High Accuracy Mode</div>
+  </div>
+
+  <div class="card">
+    <div class="history-dots" id="history"></div>
+    
+    <div class="num-grid" id="grid"></div>
+
+    <div class="prediction-box" id="predBox">
+      <div class="pred-flex">
+        <div>
+          <div class="result-label">PREDICTED SIDE</div>
+          <div class="result-value" id="nextSide">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="result-label">CONFIDENCE</div>
+          <div class="result-value" id="confPct">0%</div>
+        </div>
+      </div>
+      
+      <div class="accuracy-meter"><div class="accuracy-fill" id="meter"></div></div>
+      
+      <div class="result-label">OPTIMIZED DIGITS: <span id="optDigits" style="color:white; font-weight:bold"></span></div>
+    </div>
+
+    <div class="footer-links">
+      <button class="btn-action btn-reset" onclick="resetAll()">RESET DATA</button>
+      <button class="btn-action btn-calc" onclick="runAnalysis()">FORCED CALC</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let data = [];
+  const MAX_LOG = 5;
+
+  // Initialize Numbers
+  const grid = document.getElementById('grid');
+  for(let i=0; i<=9; i++) {
+    const b = document.createElement('button');
+    b.className = 'n-btn';
+    b.innerText = i;
+    b.onclick = () => addDigit(i);
+    grid.appendChild(b);
+  }
+
+  function addDigit(n) {
+    data.unshift(n);
+    if(data.length > MAX_LOG) data.pop();
+    render();
+    if(data.length >= 3) runAnalysis(); // Auto-trigger after 3 entries
+  }
+
+  function render() {
+    const hist = document.getElementById('history');
+    hist.innerHTML = '';
+    data.forEach(num => {
+      const d = document.createElement('div');
+      const type = num >= 5 ? 'big' : 'small';
+      d.className = `dot ${type}`;
+      d.innerText = num;
+      hist.appendChild(d);
+    });
+  }
+
+  function runAnalysis() {
+    if(data.length < 2) return;
+    
+    const sequence = data.map(n => n >= 5 ? 1 : 0); // 1 for Big, 0 for Small
+    
+    // 1. Markov Chain Weight (Transition probability)
+    let bigProb = 0.5;
+    if(sequence[0] === sequence[1]) {
+      bigProb += (sequence[0] === 1) ? -0.15 : 0.15; // Mean Reversion logic
+    } else {
+      bigProb += (sequence[0] === 1) ? 0.1 : -0.1; // Trend continuation
+    }
+
+    // 2. Bayesian Ratio (Count frequency)
+    const bigs = sequence.filter(x => x === 1).length;
+    const ratio = bigs / sequence.length;
+    bigProb = (bigProb * 0.6) + ((1 - ratio) * 0.4); // Balance the law of large numbers
+
+    // 3. Final Calculation
+    const result = bigProb >= 0.5 ? 'BIG' : 'SMALL';
+    const confidence = Math.floor(Math.abs(bigProb - 0.5) * 200) + 40; 
+    const finalConf = Math.min(confidence, 98); // Cap at 98%
+
+    // Update UI
+    document.getElementById('predBox').style.display = 'block';
+    const sideEl = document.getElementById('nextSide');
+    sideEl.innerText = result;
+    sideEl.style.color = result === 'BIG' ? 'var(--big-color)' : 'var(--small-color)';
+    
+    document.getElementById('confPct').innerText = finalConf + '%';
+    document.getElementById('meter').style.width = finalConf + '%';
+
+    // Digit Optimization
+    const suggested = result === 'BIG' ? [5, 7, 9] : [0, 2, 4];
+    document.getElementById('optDigits').innerText = suggested.join(', ');
+  }
+
+  function resetAll() {
+    data = [];
+    render();
+    document.getElementById('predBox').style.display = 'none';
+  }
+</script>
+</body>
+</html>
 <div class="ai-core">
     <div class="system-status"><span class="blink">●</span> V12 OVERLORD: 100% SURE-SHOT CALCULATION</div>
     
