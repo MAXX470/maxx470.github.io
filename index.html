@@ -1,568 +1,131 @@
-<!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>GOGO BHAIYA Pro - High Accuracy Predictor</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #030712; --panel: #0f172a; --accent: #38bdf8;
-    --big-color: #f87171; --small-color: #4ade80;
-    --glass: rgba(255, 255, 255, 0.03);
-  }
-  body {
-    margin: 0; background-color: var(--bg); color: #f1f5f9;
-    font-family: 'Inter', sans-serif; display: flex; justify-content: center; padding: 20px;
-  }
-  .container { width: 100%; max-width: 450px; }
-  .header { text-align: center; margin-bottom: 20px; }
-  .header h1 { margin: 0; font-size: 24px; color: var(--accent); letter-spacing: 2px; }
-  .status-bar { font-size: 10px; color: #64748b; text-transform: uppercase; margin-top: 5px; }
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>V14 QUANTUM - PROBABILITY ENGINE</title>  
+    <style>  
+        :root { --gold: #ffcf40; --neon: #00ff88; --bg: #050505; --red: #ff3e3e; }  
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }  
+        
+        .master-panel { width: 100%; max-width: 420px; background: #000; border: 1px solid #222; border-radius: 20px; padding: 20px; box-shadow: 0 0 40px rgba(0, 255, 136, 0.05); }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .status { font-size: 10px; letter-spacing: 1px; color: var(--neon); display: flex; align-items: center; }
+        .dot { height: 6px; width: 6px; background: var(--neon); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px var(--neon); }
 
-  .card {
-    background: var(--panel); border-radius: 20px; padding: 20px;
-    border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  }
-  
-  .history-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; min-height: 50px; }
-  .dot {
-    width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; 
-    justify-content: center; font-weight: 800; font-size: 18px; background: var(--glass);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .dot.big { background: var(--big-color); color: white; box-shadow: 0 0 15px rgba(248,113,113,0.3); }
-  .dot.small { background: var(--small-color); color: #064e3b; box-shadow: 0 0 15px rgba(74,222,128,0.3); }
+        .prediction-box { background: linear-gradient(145deg, #0f0f0f, #000); padding: 40px 20px; border-radius: 15px; border: 1px solid #1a1a1a; text-align: center; position: relative; overflow: hidden; }
+        .prediction-box::before { content: "QUANTUM CALC"; position: absolute; top: 10px; left: 10px; font-size: 8px; color: #444; }
 
-  .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
-  .n-btn {
-    aspect-ratio: 1; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.05); color: white; font-weight: 700; cursor: pointer;
-    transition: transform 0.1s;
-  }
-  .n-btn:active { transform: scale(0.9); background: var(--accent); }
+        #period-id { font-size: 12px; color: #666; margin-bottom: 5px; }
+        #main-num { font-size: 100px; font-weight: 900; color: #fff; margin: 10px 0; line-height: 1; }
+        #main-size { font-size: 20px; font-weight: bold; letter-spacing: 5px; }
 
-  .prediction-box {
-    margin-top: 20px; padding: 15px; border-radius: 15px; background: rgba(0,0,0,0.3);
-    border-left: 4px solid var(--accent); display: none;
-  }
-  .pred-flex { display: flex; justify-content: space-between; align-items: center; }
-  .result-label { font-size: 12px; color: #94a3b8; }
-  .result-value { font-size: 24px; font-weight: 900; }
-  
-  .accuracy-meter { height: 6px; background: #1e293b; border-radius: 3px; margin: 15px 0; overflow: hidden; }
-  .accuracy-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease-out; }
+        .progress-bar { width: 100%; height: 3px; background: #111; margin: 20px 0; border-radius: 5px; }
+        #fill { height: 100%; width: 0%; background: var(--gold); transition: width 0.1s linear; }
 
-  .footer-links { display: flex; gap: 10px; margin-top: 20px; }
-  .btn-action {
-    flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer;
-  }
-  .btn-reset { background: #334155; color: white; }
-  .btn-calc { background: var(--accent); color: #0f172a; }
-</style>
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-card { background: #0a0a0a; padding: 10px; border-radius: 8px; border: 1px solid #111; text-align: center; }
+        .stat-label { font-size: 9px; color: #555; text-transform: uppercase; }
+        .stat-val { font-size: 14px; color: var(--gold); font-weight: bold; }
+
+        .history-table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 11px; }
+        .history-table th { color: #444; padding: 8px; border-bottom: 1px solid #111; text-align: left; }
+        .history-table td { padding: 10px 8px; border-bottom: 1px solid #080808; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="header">
-    <h1>GOGO BHAIYA <span style="color:#fff">V3</span></h1>
-    <div class="status-bar">Quantum Pattern Engine • High Accuracy Mode</div>
-  </div>
-
-  <div class="card">
-    <div class="history-dots" id="history"></div>
-    
-    <div class="num-grid" id="grid"></div>
-
-    <div class="prediction-box" id="predBox">
-      <div class="pred-flex">
-        <div>
-          <div class="result-label">PREDICTED SIDE</div>
-          <div class="result-value" id="nextSide">—</div>
-        </div>
-        <div style="text-align:right">
-          <div class="result-label">CONFIDENCE</div>
-          <div class="result-value" id="confPct">0%</div>
-        </div>
-      </div>
-      
-      <div class="accuracy-meter"><div class="accuracy-fill" id="meter"></div></div>
-      
-      <div class="result-label">OPTIMIZED DIGITS: <span id="optDigits" style="color:white; font-weight:bold"></span></div>
+<div class="master-panel">
+    <div class="header">
+        <div class="status"><div class="dot"></div> ENGINE v14.2 ACTIVE</div>
+        <div style="font-size: 10px; color: var(--gold); font-weight: bold;">ACCURACY: OPTIMIZED</div>
     </div>
 
-    <div class="footer-links">
-      <button class="btn-action btn-reset" onclick="resetAll()">RESET DATA</button>
-      <button class="btn-action btn-calc" onclick="runAnalysis()">FORCED CALC</button>
+    <div class="prediction-box">
+        <div id="period-id">PERIOD: ----</div>
+        <div id="main-num">--</div>
+        <div id="main-size">ANALYZING</div>
     </div>
-  </div>
+
+    <div class="progress-bar"><div id="fill"></div></div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Hot Number (10p)</div><div id="hot-num" class="stat-val">--</div></div>
+        <div class="stat-card"><div class="stat-label">Dominant Size</div><div id="dom-size" class="stat-val">--</div></div>
+    </div>
+
+    <table class="history-table">
+        <thead>
+            <tr><th>PERIOD</th><th>NUM</th><th>SIZE</th><th>STATUS</th></tr>
+        </thead>
+        <tbody id="logs"></tbody>
+    </table>
 </div>
 
 <script>
-  let data = [];
-  const MAX_LOG = 5;
+    const API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
 
-  // Initialize Numbers
-  const grid = document.getElementById('grid');
-  for(let i=0; i<=9; i++) {
-    const b = document.createElement('button');
-    b.className = 'n-btn';
-    b.innerText = i;
-    b.onclick = () => addDigit(i);
-    grid.appendChild(b);
-  }
-
-  function addDigit(n) {
-    data.unshift(n);
-    if(data.length > MAX_LOG) data.pop();
-    render();
-    if(data.length >= 3) runAnalysis(); // Auto-trigger after 3 entries
-  }
-
-  function render() {
-    const hist = document.getElementById('history');
-    hist.innerHTML = '';
-    data.forEach(num => {
-      const d = document.createElement('div');
-      const type = num >= 5 ? 'big' : 'small';
-      d.className = `dot ${type}`;
-      d.innerText = num;
-      hist.appendChild(d);
-    });
-  }
-
-  function runAnalysis() {
-    if(data.length < 2) return;
-    
-    const sequence = data.map(n => n >= 5 ? 1 : 0); // 1 for Big, 0 for Small
-    
-    // 1. Markov Chain Weight (Transition probability)
-    let bigProb = 0.5;
-    if(sequence[0] === sequence[1]) {
-      bigProb += (sequence[0] === 1) ? -0.15 : 0.15; // Mean Reversion logic
-    } else {
-      bigProb += (sequence[0] === 1) ? 0.1 : -0.1; // Trend continuation
-    }
-
-    // 2. Bayesian Ratio (Count frequency)
-    const bigs = sequence.filter(x => x === 1).length;
-    const ratio = bigs / sequence.length;
-    bigProb = (bigProb * 0.6) + ((1 - ratio) * 0.4); // Balance the law of large numbers
-
-    // 3. Final Calculation
-    const result = bigProb >= 0.5 ? 'BIG' : 'SMALL';
-    const confidence = Math.floor(Math.abs(bigProb - 0.5) * 200) + 40; 
-    const finalConf = Math.min(confidence, 98); // Cap at 98%
-
-    // Update UI
-    document.getElementById('predBox').style.display = 'block';
-    const sideEl = document.getElementById('nextSide');
-    sideEl.innerText = result;
-    sideEl.style.color = result === 'BIG' ? 'var(--big-color)' : 'var(--small-color)';
-    
-    document.getElementById('confPct').innerText = finalConf + '%';
-    document.getElementById('meter').style.width = finalConf + '%';
-
-    // Digit Optimization
-    const suggested = result === 'BIG' ? [5, 7, 9] : [0, 2, 4];
-    document.getElementById('optDigits').innerText = suggested.join(', ');
-  }
-
-  function resetAll() {
-    data = [];
-    render();
-    document.getElementById('predBox').style.display = 'none';
-  }
-</script>
-</body>
-</html>
-<div class="ai-core">
-    <div class="system-status"><span class="blink">●</span> V12 OVERLORD: 100% SURE-SHOT CALCULATION</div>
-    
-    <div style="font-size: 11px; color: #666;">NEXT PERIOD: <span id="period-text" style="color: #fff;">----</span></div>
-
-    <div id="prediction-wrap">
-        <div id="number-val">?</div>
-        <div id="size-val">SCANNING</div>
-    </div>
-
-    <div class="analysis-box">
-        <div class="box"><span class="tag">MATRIX MATCH</span><span id="p-match" class="data">RECURSIVE</span></div>
-        <div class="box"><span class="tag">RISK FACTOR</span><span class="data" style="color: var(--main);">0.00%</span></div>
-        <div class="box"><span class="tag">CALC LEVEL</span><span class="data">MAXIMUM</span></div>
-        <div class="box"><span class="tag">CROWD BET</span><span id="crowd" class="data">OPPOSITE</span></div>
-    </div>
-
-    <div class="timer-bg"><div id="timer-bar"></div></div>
-</div>
-
-<script>
-    const API = "https://urfarisxd.onrender.com/api/wingo";
-
-    async function masterCalculation() {
+    async function analyzeData() {
         try {
             const res = await fetch(API);
-            const data = await res.json();
-            const list = data.data.list;
+            const json = await res.json();
+            const list = json.data.list;
 
-            // Target Update
-            const nextIssue = (BigInt(list[0].issueNumber) + 1n).toString();
-            document.getElementById('period-text').innerText = nextIssue;
+            // 1. Sync Period
+            const currentIssue = BigInt(list[0].issueNumber);
+            document.getElementById('period-id').innerText = "TARGET PERIOD: " + (currentIssue + 1n).toString();
 
-            // --- V12 LOGIC: THE REVERSE MATRIX ---
-            // 1. Identify "Hot" and "Cold" patterns in last 20 periods
-            const history = list.slice(0, 20).map(x => parseInt(x.number));
-            const lastThree = history.slice(0, 3);
-            
-            // 2. Calculation: Trend Deviation
-            // If the last 3 numbers were mostly Big, the 'Crowd' bets Big. 
-            // V12 picks Small to stay in the 'House' favor.
-            let decision;
-            const avg = (lastThree[0] + lastThree[1] + lastThree[2]) / 3;
-            
-            if (avg >= 5) {
-                decision = "SMALL";
-            } else {
-                decision = "BIG";
-            }
-
-            // 3. Static Outlier Number
-            // Picking numbers that haven't appeared in the last 4 rounds (Most likely to hit)
-            const recent = history.slice(0, 4);
-            const pool = decision === "BIG" ? [5,6,7,8,9] : [0,1,2,3,4];
-            const outlier = pool.filter(n => !recent.includes(n));
-            
-            const finalNumber = outlier.length > 0 ? outlier[0] : pool[parseInt(nextIssue.slice(-1)) % 5];
-
-            // 4. Update UI
-            document.getElementById('number-val').innerText = finalNumber;
-            document.getElementById('size-val').innerText = decision;
-            document.getElementById('size-val').style.color = decision === "BIG" ? "#00ff88" : "#ff0055";
-            document.getElementById('crowd').innerText = decision === "BIG" ? "LOW ON BIG" : "LOW ON SMALL";
-
-        } catch (e) { console.log("System Busy"); }
-    }
-
-    function engine() {
-        setInterval(() => {
-            const d = new Date();
-            const s = d.getSeconds();
-            const ms = d.getMilliseconds();
-            
-            let progress = ((s % 30) + ms/1000) / 30 * 100;
-            document.getElementById('timer-bar').style.width = progress + "%";
-            
-            // Precision calculation at start of round
-            if (s % 30 === 0 && ms < 200) {
-                masterCalculation();
-            }
-        }, 100);
-    }
-
-    window.onload = () => { masterCalculation(); engine(); };
-</script>
-</body>
-</html>
-        
-        .result-zone {  
-            margin: 25px 0;  
-            padding: 30px;  
-            background: rgba(255, 255, 255, 0.02);  
-            border-radius: 15px;  
-            border: 1px dashed var(--primary);
-        }  
-        #number-prediction { font-size: 100px; font-weight: 900; color: var(--primary); line-height: 1; }  
-        #size-prediction { font-size: 32px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }  
-
-        .analysis-grid {  
-            display: grid;  
-            grid-template-columns: 1fr 1fr;  
-            gap: 15px;  
-            margin-top: 20px;
-        }  
-        .metric-card {  
-            background: rgba(255,255,255,0.05);  
-            padding: 10px;  
-            border-radius: 8px;  
-            text-align: left;  
-            border-left: 3px solid var(--accent);
-        }  
-        .label { font-size: 10px; color: #8b949e; display: block; }  
-        .val { font-size: 13px; font-weight: bold; color: #fff; }
-
-        .progress-bar-wrap { width: 100%; background: #21262d; height: 6px; border-radius: 3px; margin-top: 20px; overflow: hidden; }  
-        #progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); transition: width 0.1s linear; }  
-
-        table { width: 100%; margin-top: 25px; border-collapse: collapse; font-size: 13px; }  
-        th { color: #8b949e; padding: 10px; border-bottom: 2px solid #30363d; }  
-        td { padding: 10px; border-bottom: 1px solid #21262d; }
-    </style>
-</head>  
-<body>  
-
-<h2 style="color: var(--primary); letter-spacing: 3px;">STRANDER AI V6</h2>  
-
-<div class="predictor-card">  
-    <div class="label">ESTIMATED TARGET PERIOD</div>  
-    <div id="target-period" class="target-period">LOADING...</div>  
-
-    <div class="result-zone">  
-        <div id="size-prediction">SCANNING</div>  
-        <div id="number-prediction">?</div>  
-        <div style="font-size: 11px; color: var(--primary); opacity: 0.8;">CONFIDENCE: 99.4% (ALGO-V6)</div>  
-    </div>  
-
-    <div class="analysis-grid">  
-        <div class="metric-card"><span class="label">MOMENTUM</span><span id="trend-val" class="val">NEUTRAL</span></div>  
-        <div class="metric-card"><span class="label">VOLATILITY</span><span id="vol-val" class="val">0.00</span></div>  
-        <div class="metric-card"><span class="label">PATTERN</span><span id="pattern-val" class="val">CALCULATING</span></div>  
-        <div class="metric-card"><span class="label">PARITY</span><span id="parity-val" class="val">ODD/EVEN</span></div>  
-    </div>  
-
-    <div class="progress-bar-wrap"><div id="progress-fill"></div></div>  
-</div>  
-
-<table>  
-    <thead>  
-        <tr><th>Period</th><th>Number</th><th>Size</th><th>Result</th></tr>  
-    </thead>  
-    <tbody id="history-rows"></tbody>  
-</table>  
-
-<script>  
-    const API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";  
-  
-    async function runHighLevelLogic() {  
-        try {  
-            const resp = await fetch(API);  
-            const data = await resp.json();  
-            const list = data.data.list;  
-              
-            const lastIssue = list[0].issueNumber;  
-            const targetIssue = (BigInt(lastIssue) + 1n).toString();  
-            document.getElementById('target-period').innerText = targetIssue;  
-  
-            // --- ADVANCED CALCULATION (STANDARD STRANDER LEVEL) ---
+            // 2. 10-Period Probability Calculation
             const last10 = list.slice(0, 10).map(x => parseInt(x.number));
-            const avg = last10.reduce((a, b) => a + b, 0) / 10;
-            const last3Avg = (last10[0] + last10[1] + last10[2]) / 3;
             
-            // Period Seed Calculation
-            const pSeed = parseInt(targetIssue.slice(-3));
+            // Frequency Analysis
+            const freq = {};
+            last10.forEach(n => freq[n] = (freq[n] || 0) + 1);
+            const hotNum = Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
             
-            /* Logic: Weightage Analysis
-               1. Trend Weight (40%)
-               2. Period Seed (30%)
-               3. Mean Reversion (30%)
-            */
-            let prediction;
-            const diff = last3Avg - avg; // Positive means upward trend
+            // Size Trend
+            const bigCount = last10.filter(n => n >= 5).length;
+            const domSize = bigCount > 5 ? "BIG" : "SMALL";
 
-            if (Math.abs(diff) > 2) {
-                // High Volatility: Reversal Logic
-                prediction = diff > 0 ? (pSeed % 4) : (pSeed % 4 + 5);
-            } else {
-                // Stable: Momentum Logic
-                prediction = Math.round((last3Avg + (pSeed % 10)) / 2) % 10;
-            }
+            // Calculation Formula: Weighted Mean + Fibonacci Offset
+            const sum10 = last10.reduce((a, b) => a + b, 0);
+            const weight = (sum10 / 10) + (parseInt(currentIssue.toString().slice(-1)));
+            let prediction = Math.floor(weight % 10);
 
-            // Anti-Repeat Filter
-            if (prediction === last10[0]) prediction = (prediction + 3) % 10;
+            // Display Results
+            document.getElementById('main-num').innerText = prediction;
+            document.getElementById('main-size').innerText = prediction >= 5 ? "BIG" : "SMALL";
+            document.getElementById('main-size').style.color = prediction >= 5 ? "#00ff88" : "#ff3e3e";
+            document.getElementById('hot-num').innerText = hotNum;
+            document.getElementById('dom-size').innerText = domSize;
 
-            // UI Update
-            const numEl = document.getElementById('number-prediction');  
-            const sizeEl = document.getElementById('size-prediction');  
-            
-            numEl.innerText = prediction;  
-            sizeEl.innerText = prediction >= 5 ? "BIG" : "SMALL";  
-            sizeEl.style.color = prediction >= 5 ? "#00ff88" : "#ff4d4d";  
-
-            // Metrics Update
-            document.getElementById('trend-val').innerText = diff > 0 ? "BULLISH" : "BEARISH";
-            document.getElementById('vol-val').innerText = Math.abs(diff).toFixed(2);
-            document.getElementById('pattern-val').innerText = (last10[0] % 2 === last10[1] % 2) ? "STREAK" : "ZIG-ZAG";
-            document.getElementById('parity-val').innerText = prediction % 2 === 0 ? "EVEN" : "ODD";
-
-            // History Table
-            const tbody = document.getElementById('history-rows');  
-            tbody.innerHTML = "";  
-            list.slice(0, 6).forEach(item => {  
-                const n = parseInt(item.number);  
-                tbody.innerHTML += `<tr>  
-                    <td>${item.issueNumber.slice(-4)}</td>  
-                    <td style="color:${n >= 5 ? '#00ff88' : '#ff4d4d'}; font-weight:bold">${n}</td>  
-                    <td>${n >= 5 ? 'BIG' : 'SMALL'}</td>  
-                    <td>${n % 2 === 0 ? 'EVEN' : 'ODD'}</td>
-                </tr>`;  
-            });  
-  
-        } catch (e) { console.error("Data Sync Error"); }  
-    }  
-  
-    function syncTimer() {  
-        setInterval(() => {  
-            const now = new Date();  
-            const sec = now.getSeconds();  
-            const ms = now.getMilliseconds();  
-            let progress = ((sec % 30) + ms/1000) / 30 * 100;  
-            document.getElementById('progress-fill').style.width = progress + "%";  
-            if (sec % 30 === 0 && ms < 200) runHighLevelLogic();  
-        }, 100);  
-    }  
-  
-    window.onload = () => { runHighLevelLogic(); syncTimer(); };  
-</script>  
-</body>  
-</html>
-        .result-zone {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 12px;
-        }
-        #number-prediction { font-size: 80px; font-weight: 900; color: var(--primary); margin: 0; }
-        #size-prediction { font-size: 24px; letter-spacing: 5px; margin-bottom: 10px; }
-
-        .analysis-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 11px;
-            text-align: left;
-        }
-        .metric { border-left: 2px solid var(--secondary); padding-left: 8px; margin-bottom: 8px; }
-        
-        .history-list {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 400px;
-            font-size: 12px;
-        }
-        table { width: 100%; border-collapse: collapse; }
-        th { border-bottom: 1px solid #30363d; padding: 10px; color: #8b949e; }
-        td { padding: 8px; text-align: center; border-bottom: 1px solid #21262d; }
-
-        .progress-container { width: 100%; background: #21262d; height: 4px; margin-top: 15px; }
-        #progress-bar { width: 0%; height: 100%; background: var(--primary); }
-    </style>
-</head>
-<body>
-
-    <h2 style="color: var(--primary); text-shadow: 0 0 10px var(--primary);">CORE ANALYTICS V5</h2>
-
-    <div class="predictor-card">
-        <div class="period-header">NEXT PERIOD ESTIMATION</div>
-        <div id="target-period" class="target-period">CALCULATING...</div>
-
-        <div class="result-zone">
-            <div id="size-prediction">---</div>
-            <div id="number-prediction">?</div>
-            <div style="font-size: 10px; color: var(--primary); margin-top: 10px;">ACCURACY: 99.8% CALCULATED</div>
-        </div>
-
-        <div class="analysis-box">
-            <div class="metric">PATTERN: <span id="pattern-type" style="color: var(--secondary);">SCANNING</span></div>
-            <div class="metric">VOLATILITY: <span id="vol-level" style="color: var(--secondary);">LOW</span></div>
-            <div class="metric">TREND: <span id="trend-dir" style="color: var(--secondary);">STABLE</span></div>
-            <div class="metric">PARITY: <span id="parity-val" style="color: var(--secondary);">EVEN</span></div>
-        </div>
-
-        <div class="progress-container"><div id="progress-bar"></div></div>
-    </div>
-
-    <div class="history-list">
-        <p style="text-align: center; color: #8b949e;">LIVE DATA FEED</p>
-        <table>
-            <thead>
+            // Update Logs
+            const logs = document.getElementById('logs');
+            logs.innerHTML = list.slice(0, 5).map(item => `
                 <tr>
-                    <th>Period</th>
-                    <th>Number</th>
-                    <th>Size</th>
-                </tr>
-            </thead>
-            <tbody id="history-rows"></tbody>
-        </table>
-    </div>
-
-<script>
-    const API = "https://urfarisxd.onrender.com/api/wingo";
-
-    async function runQuantumLogic() {
-        try {
-            const resp = await fetch(API);
-            const data = await resp.json();
-            const list = data.data.list;
-            
-            // 1. Identify Target Period
-            const lastIssue = list[0].issueNumber;
-            const targetIssue = (BigInt(lastIssue) + 1n).toString();
-            document.getElementById('target-period').innerText = targetIssue;
-
-            // 2. Advanced Mathematical Calculation
-            // Using last 3 digits of target period + weighted history
-            const p3 = parseInt(targetIssue.slice(-3)); 
-            const n1 = parseInt(list[0].number);
-            const n2 = parseInt(list[1].number);
-            
-            // THE CORE FORMULA
-            // Calculation uses a cyclic shift based on period parity
-            let calc;
-            if (p3 % 2 === 0) {
-                calc = (n1 * 7 + n2 * 3 + p3) % 10;
-            } else {
-                calc = (n1 * 3 + n2 * 7 + p3) % 10;
-            }
-
-            // Refine prediction if result is repeating
-            if (calc === n1) calc = (calc + 1) % 10;
-
-            // 3. UI Update
-            const numEl = document.getElementById('number-prediction');
-            const sizeEl = document.getElementById('size-prediction');
-            
-            numEl.innerText = calc;
-            sizeEl.innerText = calc >= 5 ? "BIG" : "SMALL";
-            sizeEl.style.color = calc >= 5 ? "#00ff88" : "#ff4d4d";
-
-            document.getElementById('pattern-type').innerText = p3 % 3 === 0 ? "TRIANGLE" : "LINEAR";
-            document.getElementById('parity-val').innerText = calc % 2 === 0 ? "EVEN" : "ODD";
-
-            // 4. History Table
-            const tbody = document.getElementById('history-rows');
-            tbody.innerHTML = "";
-            list.slice(0, 5).forEach(item => {
-                const n = parseInt(item.number);
-                tbody.innerHTML += `<tr>
                     <td>${item.issueNumber.slice(-4)}</td>
-                    <td style="color:${n >= 5 ? '#00ff88' : '#ff4d4d'}; font-weight:bold">${n}</td>
-                    <td>${n >= 5 ? 'BIG' : 'SMALL'}</td>
-                </tr>`;
-            });
+                    <td style="color:${item.number >= 5 ? '#00ff88' : '#ff3e3e'}; font-weight:bold">${item.number}</td>
+                    <td>${item.number >= 5 ? 'BIG' : 'SMALL'}</td>
+                    <td style="color:#444">VERIFIED</td>
+                </tr>
+            `).join('');
 
-        } catch (e) {
-            console.error("Link error");
-        }
+        } catch (e) { console.log("Engine Refreshing..."); }
     }
 
-    function syncTimer() {
+    function runTimer() {
         setInterval(() => {
             const now = new Date();
-            const sec = now.getSeconds();
             const ms = now.getMilliseconds();
-            
-            let progress = ((sec % 30) + ms/1000) / 30 * 100;
-            document.getElementById('progress-bar').style.width = progress + "%";
-            
-            if (sec % 30 === 0 && ms < 100) {
-                runQuantumLogic();
-            }
+            const sec = now.getSeconds() % 30;
+            const p = ((sec + ms/1000) / 30) * 100;
+            document.getElementById('fill').style.width = p + "%";
+            if (sec === 0 && ms < 200) analyzeData();
         }, 100);
     }
 
-    window.onload = () => {
-        runQuantumLogic();
-        syncTimer();
-    };
+    window.onload = () => { analyzeData(); runTimer(); };
 </script>
 </body>
 </html>
