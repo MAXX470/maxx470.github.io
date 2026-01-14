@@ -3,164 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jalwa Injector V5 - Elite</title>
+    <title>JALWA V5 - CALCULATION ENGINE</title>
     <style>
         :root {
             --neon: #00ff88;
             --gold: #ffcc00;
-            --danger: #ff3e3e;
-            --glass: rgba(10, 10, 10, 0.98);
+            --bg: #050505;
         }
-        body { background: #000; color: #fff; font-family: 'monospace'; margin: 0; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         
-        .injector-ui {
-            width: 340px;
-            background: var(--glass);
-            border: 2px solid #222;
-            border-top: 4px solid var(--neon);
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            z-index: 10000;
-        }
-        .header {
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #222;
-            background: rgba(255,255,255,0.02);
-        }
-        .header span { font-size: 10px; letter-spacing: 1px; }
-        
-        /* Prediction Display */
-        .main-screen {
-            padding: 20px;
-            text-align: center;
-            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
-        }
-        .p-label { color: #666; font-size: 11px; margin-bottom: 5px; }
-        .p-number { font-size: 5rem; font-weight: 900; line-height: 1; margin: 5px 0; color: var(--neon); }
-        .p-size { font-size: 1.5rem; font-weight: bold; letter-spacing: 10px; text-transform: uppercase; }
-
-        /* Martingale Calculator Section */
-        .calculator-panel {
-            background: #111;
-            margin: 10px;
-            padding: 12px;
-            border-radius: 8px;
+        .terminal {
+            width: 350px;
+            background: #0a0a0a;
             border: 1px solid #333;
+            border-top: 4px solid var(--neon);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.1);
         }
-        .calc-title { color: var(--gold); font-size: 10px; margin-bottom: 8px; text-align: center; font-weight: bold; }
-        .bet-row { display: flex; justify-content: space-between; align-items: center; }
-        .bet-box { background: #000; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--gold); font-size: 1.1rem; color: var(--gold); }
-        .level-btns { display: flex; gap: 5px; margin-top: 10px; }
-        .lvl { flex: 1; padding: 5px; background: #222; font-size: 9px; text-align: center; cursor: pointer; border-radius: 3px; }
-        .lvl.active { background: var(--gold); color: #000; font-weight: bold; }
 
-        /* Footer Stats */
-        .footer-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 0 10px 10px; }
-        .stat-item { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 5px; text-align: center; }
-        .s-val { display: block; font-size: 11px; font-weight: bold; color: var(--neon); }
-        .s-label { font-size: 8px; color: #555; }
+        .header { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 20px; color: var(--neon); }
+        
+        .period-card { background: #111; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #222; }
+        .p-label { font-size: 10px; color: #666; letter-spacing: 2px; }
+        .p-id { font-size: 18px; color: var(--gold); font-weight: bold; margin-top: 5px; }
+
+        .display { padding: 30px 0; text-align: center; }
+        #t-num { font-size: 100px; font-weight: 900; line-height: 1; margin: 0; color: var(--neon); text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+        #t-size { font-size: 20px; font-weight: bold; letter-spacing: 5px; margin-top: 10px; }
+
+        .algo-box { font-size: 10px; color: #444; border-top: 1px solid #222; padding-top: 15px; margin-top: 15px; }
+        .loading-bar { height: 2px; width: 0%; background: var(--neon); margin-top: 5px; transition: width 1s linear; }
     </style>
 </head>
 <body>
 
-<div class="injector-ui">
+<div class="terminal">
     <div class="header">
-        <span style="color: var(--neon)">● JALWA ELITE INJECTOR</span>
-        <span id="p-id" style="color:#888">ID: ----</span>
+        <span>● JALWA ELITE V5.2</span>
+        <span id="timer">00:00</span>
     </div>
 
-    <div class="main-screen">
-        <div class="p-label">PREDICTED RESULT</div>
-        <div class="p-number" id="target-num">?</div>
-        <div class="p-size" id="target-size">BOOTING</div>
+    <div class="period-card">
+        <div class="p-label">TARGET PERIOD</div>
+        <div class="p-id" id="display-period">LOADING...</div>
     </div>
 
-    <div class="calculator-panel">
-        <div class="calc-title">MARTINGALE RECOVERY (3X)</div>
-        <div class="bet-row">
-            <span style="font-size: 10px; color:#888">NEXT BET AMOUNT:</span>
-            <div class="bet-box" id="bet-amt">₹10</div>
-        </div>
-        <div class="level-btns">
-            <div class="lvl active" onclick="setBet(1, this)">LVL 1</div>
-            <div class="lvl" onclick="setBet(2, this)">LVL 2</div>
-            <div class="lvl" onclick="setBet(3, this)">LVL 3</div>
-            <div class="lvl" onclick="setBet(4, this)">LVL 4</div>
-            <div class="lvl" onclick="setBet(5, this)">LVL 5</div>
-        </div>
+    <div class="display">
+        <div class="p-label">CALCULATED RESULT</div>
+        <div id="t-num">--</div>
+        <div id="t-size">WAITING</div>
     </div>
 
-    <div class="footer-stats">
-        <div class="stat-item"><span class="s-label">ALGO</span><span class="s-val" id="algo-type">SYNC</span></div>
-        <div class="stat-item"><span class="s-label">CONFIDENCE</span><span class="s-val">96.8%</span></div>
-        <div class="stat-item"><span class="s-label">STATUS</span><span class="s-val" style="color:var(--neon)">STABLE</span></div>
+    <div class="algo-box">
+        ALGO: <span style="color:#888">SUMMATION-DELTA-V7</span><br>
+        STATUS: <span style="color:var(--neon)" id="status">CONNECTING TO SERVER...</span>
+        <div class="loading-bar" id="l-bar"></div>
     </div>
 </div>
 
 <script>
-const API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
-let baseBet = 10;
+// Real-time API for Wingo 30s/1m Data
+const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
 
-function setBet(level, el) {
-    // Standard 3x Martingale: 10 -> 30 -> 90 -> 270 -> 810
-    const amt = baseBet * Math.pow(3, level - 1);
-    document.getElementById("bet-amt").innerText = "₹" + amt;
+async function fetchAndCalculate() {
+    const status = document.getElementById('status');
+    const lBar = document.getElementById('l-bar');
     
-    document.querySelectorAll('.lvl').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-}
+    status.innerText = "EXTRACTING DATA...";
+    lBar.style.width = "40%";
 
-function analyzeData(list) {
-    const nums = list.slice(0, 10).map(i => Number(i.number));
-    
-    // Pattern 1: Fibonacci Sequence Gap
-    const gap = Math.abs(nums[0] - nums[1]);
-    
-    // Pattern 2: Last Digit Delta
-    let pred = (nums[0] + gap) % 10;
-    
-    // Pattern 3: Anti-Dragon Logic
-    // If last 4 were BIG, predict SMALL (90% chance of break)
-    const last4Size = list.slice(0, 4).every(i => Number(i.number) >= 5);
-    const last4Small = list.slice(0, 4).every(i => Number(i.number) < 5);
-    
-    let type = "MOMENTUM";
-    if (last4Size) { pred = 2; type = "REVERSION"; }
-    if (last4Small) { pred = 7; type = "REVERSION"; }
-
-    // UI Rendering
-    document.getElementById("target-num").innerText = pred;
-    const size = pred >= 5 ? "BIG" : "SMALL";
-    const sElem = document.getElementById("target-size");
-    sElem.innerText = size;
-    sElem.style.color = size === "BIG" ? "#00ff88" : "#ff3e3e";
-    document.getElementById("algo-type").innerText = type;
-}
-
-async function startInjector() {
     try {
-        const r = await fetch(API);
-        const j = await r.json();
-        const list = j.data.list;
+        const response = await fetch(API_URL);
+        const json = await response.json();
+        const list = json.data.list;
         
-        document.getElementById("p-id").innerText = "ID: " + (BigInt(list[0].issueNumber) + 1n);
-        analyzeData(list);
+        // 1. Get current Period and set Target (Current + 1)
+        const currentPeriod = BigInt(list[0].issueNumber);
+        document.getElementById('display-period').innerText = (currentPeriod + 1n).toString();
+
+        // 2. MATHEMATICAL CALCULATION (Weighted Delta)
+        // We take the last 3 winning numbers
+        const n1 = parseInt(list[0].number);
+        const n2 = parseInt(list[1].number);
+        const n3 = parseInt(list[2].number);
+
+        // Calculation: (Last*3 + Prev*2 + PrevPrev) Modulo 10
+        // This creates a fixed mathematical "Gravity" for the next number
+        let calculatedNum = ((n1 * 3) + (n2 * 2) + n3) % 10;
         
-        // High-Speed Loop: Check every 3 seconds for data changes
-        setTimeout(startInjector, 3000);
+        // 3. UI Update
+        setTimeout(() => {
+            lBar.style.width = "100%";
+            status.innerText = "CALCULATION SUCCESS";
+            
+            const numDisplay = document.getElementById('t-num');
+            const sizeDisplay = document.getElementById('target-size');
+            
+            numDisplay.innerText = calculatedNum;
+            const isBig = calculatedNum >= 5;
+            sizeDisplay.innerText = isBig ? "BIG" : "SMALL";
+            sizeDisplay.style.color = isBig ? "#00ff88" : "#ff3e3e";
+            numDisplay.style.color = (calculatedNum % 2 === 0) ? "#ff3e3e" : "#00ff88";
+            if(calculatedNum === 0 || calculatedNum === 5) numDisplay.style.color = "#b15eff"; // Violet
+        }, 800);
+
     } catch (e) {
-        setTimeout(startInjector, 2000);
+        status.innerText = "RETRYING CONNECTION...";
+        lBar.style.width = "0%";
     }
 }
 
-startInjector();
+// Sync with global timer
+function updateTimer() {
+    const now = new Date();
+    const seconds = now.getSeconds();
+    const remaining = 30 - (seconds % 30);
+    document.getElementById('timer').innerText = `00:${remaining.toString().padStart(2, '0')}`;
+    
+    // Refresh calculation every time a new period starts
+    if (remaining === 29) {
+        document.getElementById('l-bar').style.width = "0%";
+        fetchAndCalculate();
+    }
+}
+
+// Initial Run
+fetchAndCalculate();
+setInterval(updateTimer, 1000);
 </script>
+
 </body>
 </html>
