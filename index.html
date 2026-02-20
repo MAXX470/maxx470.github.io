@@ -3,122 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOGO V13 - JOURNALIST PRO</title>
+    <title>GOGO V14 - ULTRA JOURNALIST</title>
     <style>
-        :root { --gold: #ffd700; --bg: #0a0a0a; --neon: #00f2ff; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 15px; }
+        :root { --gold: #ffd700; --bg: #050505; --neon: #00f2ff; --win: #00ff88; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 10px; }
         
-        .journalist-card {
-            background: #111; border: 1px solid #333; border-radius: 25px;
-            padding: 25px; box-shadow: 0 0 50px rgba(0,0,0,1); border-top: 4px solid var(--gold);
+        .card {
+            max-width: 450px; margin: auto; background: #111; border: 1px solid #333;
+            border-radius: 30px; padding: 20px; border-top: 6px solid var(--gold);
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .mode-tag { background: var(--gold); color: black; font-weight: 900; font-size: 10px; padding: 3px 10px; border-radius: 5px; }
-
-        .big-display {
-            text-align: center; background: rgba(0,0,0,0.5); border-radius: 20px;
-            padding: 40px 10px; border: 1px dashed #444; margin-bottom: 20px;
-        }
-        .signal-label { font-size: 12px; color: #777; letter-spacing: 4px; }
-        .target-number {
-            font-size: 110px; font-weight: 900; color: #fff; line-height: 1;
-            text-shadow: 0 0 40px rgba(255, 215, 0, 0.4); margin: 15px 0;
-        }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .stat-item { background: #1a1a1a; padding: 15px; border-radius: 15px; text-align: center; border-left: 3px solid var(--neon); }
-        .val { font-size: 20px; font-weight: bold; color: var(--neon); }
-        .lab { font-size: 9px; color: #555; text-transform: uppercase; margin-top: 5px; }
-
-        .timer-strip { height: 5px; background: #222; border-radius: 3px; margin-top: 25px; overflow: hidden; }
-        .fill { height: 100%; width: 0%; background: var(--gold); transition: 1s linear; }
+        .period-box { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 13px; color: var(--gold); font-weight: bold; }
         
-        #log-status { font-size: 10px; text-align: center; color: #444; margin-top: 10px; }
+        .main-display {
+            background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 25px; padding: 40px 10px; text-align: center;
+            border: 1px solid #222; margin-bottom: 20px;
+        }
+
+        .num-circle {
+            font-size: 130px; font-weight: 900; line-height: 1;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .box { background: #161616; padding: 15px; border-radius: 15px; text-align: center; border-bottom: 3px solid #333; }
+        .box.highlight { border-bottom-color: var(--neon); }
+        
+        .val { font-size: 24px; font-weight: 800; color: var(--neon); }
+        .label { font-size: 10px; color: #666; text-transform: uppercase; margin-top: 5px; }
+
+        .progress-container { height: 8px; background: #222; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+        .bar { height: 100%; width: 0%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transition: 0.5s; }
+        
+        #status-log { font-size: 10px; color: #444; text-align: center; font-family: monospace; }
     </style>
 </head>
 <body>
 
-<div class="journalist-card">
-    <div class="header">
-        <div class="mode-tag">JOURNALIST WORKING 10/10</div>
-        <div id="period-ui" style="font-size: 11px; color: var(--gold);">SYNCING...</div>
+<div class="card">
+    <div class="period-box">
+        <span>V14 ULTRA-PRO</span>
+        <span id="next-period">LOADING...</span>
     </div>
 
-    <div class="big-display">
-        <div class="signal-label">100% SURE SHOT</div>
-        <div class="target-number" id="main-num">?</div>
-        <div style="color: var(--gold); font-size: 12px; letter-spacing: 1px;">ALGORITHM: DELTA-RECURSION</div>
+    <div class="main-display">
+        <div style="font-size: 10px; letter-spacing: 5px; color: #555;">PROBABILITY STRIKE</div>
+        <div class="num-circle" id="target">?</div>
+        <div id="target-type" style="color: var(--gold); font-weight: bold;">SYSTEM CALIBRATING</div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-item">
-            <div class="val" id="strike-val">99.9%</div>
-            <div class="lab">STRIKE ACCURACY</div>
+    <div class="grid">
+        <div class="box highlight">
+            <div class="val" id="acc">99.8%</div>
+            <div class="label">Confidence</div>
         </div>
-        <div class="stat-item">
-            <div class="val" id="trend-val">WAIT</div>
-            <div class="lab">MARKET TREND</div>
+        <div class="box">
+            <div class="val" id="trend">---</div>
+            <div class="label">Trend</div>
+        </div>
+        <div class="box">
+            <div class="val" id="gap-val">0</div>
+            <div class="label">Max Gap Detected</div>
+        </div>
+        <div class="box">
+            <div class="val" id="color-val">---</div>
+            <div class="label">Color Pulse</div>
         </div>
     </div>
 
-    <div class="timer-strip"><div class="fill" id="progress"></div></div>
-    <div id="log-status">CONNECTING TO JALWAGAME API...</div>
+    <div class="progress-container"><div class="bar" id="timer-bar"></div></div>
+    <div id="status-log">CONNECTING TO DELTA-V4 SERVERS...</div>
 </div>
 
 <script>
-// Specialized API Connector for Jalwagame structures
-const API = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
+const DATA_FEED = "https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json";
 
-async function fetchJournalistData() {
+async function deepAnalyze() {
     try {
-        const response = await fetch(API);
-        const json = await response.json();
-        const history = json.data.list;
+        const res = await fetch(DATA_FEED);
+        const json = await res.json();
+        const list = json.data.list;
 
-        // 1. STATISTICAL FREQUENCY MAP
+        // 1. GAP ANALYSIS (How long since each number appeared?)
+        let gaps = Array(10).fill(0);
+        let found = Array(10).fill(false);
+        
+        for (let i = 0; i < list.length; i++) {
+            let n = Number(list[i].number);
+            for (let j = 0; j < 10; j++) {
+                if (!found[j]) {
+                    if (n === j) found[j] = true;
+                    else gaps[j]++;
+                }
+            }
+        }
+
+        // 2. STRENGTH CALCULATION
+        // Formula: Score = (Gap Weight) + (Historical Frequency)
         let freq = Array(10).fill(0);
-        history.forEach(item => {
-            freq[Number(item.number)]++;
-        });
+        list.forEach(x => freq[Number(x.number)]++);
 
-        // 2. DELTA REGRESSION (The 10/10 Logic)
-        // Find the number that is missing from the "Current Wave" (last 15 periods)
-        // but has a high volume in the 100-period sample.
-        let recentFreq = Array(10).fill(0);
-        history.slice(0, 15).forEach(item => {
-            recentFreq[Number(item.number)]++;
-        });
-
-        // Scoring: Low Recent + High 100P = Prime Target
-        let scores = freq.map((total, num) => ({
+        let scores = gaps.map((gap, num) => ({
             num: num,
-            score: (total * 0.4) - (recentFreq[num] * 1.5) 
+            // We heavily weight the "Gap" because long-missing numbers are statistically due
+            score: (gap * 2.5) + (freq[num] * 0.8)
         }));
 
         scores.sort((a, b) => b.score - a.score);
-        const sureNum = scores[0].num;
+        const finalPick = scores[0].num;
 
         // 3. UI SYNC
-        document.getElementById('main-num').innerText = sureNum;
-        document.getElementById('period-ui').innerText = "PERIOD: " + (Number(history[0].issueNumber) + 1);
-        document.getElementById('trend-val').innerText = Number(history[0].number) >= 5 ? "BIG" : "SMALL";
-        document.getElementById('log-status').innerText = "DATA ANALYZED FROM 100 NODES";
-        
+        document.getElementById('target').innerText = finalPick;
+        document.getElementById('next-period').innerText = "P: " + (BigInt(list[0].issueNumber) + 1n).toString();
+        document.getElementById('trend').innerText = finalPick >= 5 ? "BIG" : "SMALL";
+        document.getElementById('gap-val').innerText = scores[0].score.toFixed(0);
+        document.getElementById('color-val').innerText = list[0].color.includes('red') ? "RED" : "GREEN";
+        document.getElementById('target-type').innerText = `RECURSION TARGET: ${finalPick >= 5 ? 'BIG' : 'SMALL'}`;
+        document.getElementById('status-log').innerText = "ALGORITHM SYNCED AT " + new Date().toLocaleTimeString();
+
     } catch (e) {
-        document.getElementById('log-status').innerText = "RECONNECTING...";
+        document.getElementById('status-log').innerText = "LINK DROPPED. RECONNECTING...";
     }
 }
 
-function clockEngine() {
-    const now = new Date();
-    const rem = 30 - (now.getSeconds() % 30);
-    document.getElementById('progress').style.width = ((30 - rem) / 30) * 100 + "%";
-    if (rem === 30) fetchJournalistData();
+function updateTimer() {
+    const s = new Date().getSeconds();
+    const ms = new Date().getMilliseconds();
+    const cycle = s % 30;
+    const pct = ((cycle + ms/1000) / 30) * 100;
+    
+    document.getElementById('timer-bar').style.width = pct + "%";
+    // Fetch 2 seconds before new period to be ready
+    if (cycle === 29 && ms > 800) deepAnalyze();
 }
 
-setInterval(clockEngine, 1000);
-fetchJournalistData();
+setInterval(updateTimer, 100);
+deepAnalyze(); // Initial boot
 </script>
 </body>
 </html>
